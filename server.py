@@ -19,9 +19,13 @@ class StepRequest(BaseModel):
 # ✅ FIXED RESET (no body required)
 @app.post("/reset")
 async def reset():
-    result = await env.reset("easy")
+    result = await env.reset()
+
     return {
-        "observation": result.observation.dict(),
+        "observation": {
+            "text": result.observation.content,  
+            "task": result.observation.task
+        },
         "reward": result.reward,
         "done": result.done
     }
@@ -34,7 +38,10 @@ async def step(req: StepRequest):
     result = await env.step(action)
 
     return {
-        "observation": result.observation.dict(),
+        "observation": {
+            "text": result.observation.content,   # 🔥 same fix
+            "task": result.observation.task
+        },
         "reward": result.reward,
         "done": result.done
     }
