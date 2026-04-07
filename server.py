@@ -7,21 +7,27 @@ app = FastAPI()
 
 env = ModerationEnv()
 
-class ResetRequest(BaseModel):
-    task: str = "easy"
+
+# ----------- REQUEST MODELS -----------
 
 class StepRequest(BaseModel):
     action: str
 
+
+# ----------- ENDPOINTS -----------
+
+# ✅ FIXED RESET (no body required)
 @app.post("/reset")
-async def reset(req: ResetRequest):
-    result = await env.reset(req.task)
+async def reset():
+    result = await env.reset("easy")
     return {
         "observation": result.observation.dict(),
         "reward": result.reward,
         "done": result.done
     }
 
+
+# ✅ STEP endpoint
 @app.post("/step")
 async def step(req: StepRequest):
     action = Action(action=req.action)
@@ -33,6 +39,8 @@ async def step(req: StepRequest):
         "done": result.done
     }
 
+
+# ✅ STATE endpoint
 @app.get("/state")
 async def state():
     return await env.state()
