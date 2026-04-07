@@ -1,0 +1,15 @@
+name: openenv-content-moderation
+description: Content moderation environment for classifying and handling user-generated text
+version: 1.0
+
+tasks:
+  - name: easy
+    description: Binary classification of safe vs toxic content
+  - name: medium
+    description: Multi-class classification (hate, spam, toxic, safe)
+  - name: hard
+    description: Full moderation decision with severity and action
+
+entrypoint:
+  module: environment
+  class: ModerationEnv
