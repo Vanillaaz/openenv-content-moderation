@@ -22,10 +22,7 @@ async def reset():
     result = await env.reset()
 
     return {
-        "observation": {
-            "text": result.observation.content,  
-            "task": result.observation.task
-        },
+        "observation": result.observation.dict(),  # ✅ revert this
         "reward": result.reward,
         "done": result.done
     }
@@ -38,10 +35,7 @@ async def step(req: StepRequest):
     result = await env.step(action)
 
     return {
-        "observation": {
-            "text": result.observation.content,   # 🔥 same fix
-            "task": result.observation.task
-        },
+        "observation": result.observation.dict(),  # ✅ same here
         "reward": result.reward,
         "done": result.done
     }
