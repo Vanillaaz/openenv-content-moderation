@@ -11,7 +11,7 @@ dependencies = [
 ]
 
 [project.scripts]
-server = "server:main"
+server = "app:main"
 
 [tool.openenv]
 entrypoint = "environment:ModerationEnv"

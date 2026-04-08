@@ -49,6 +49,9 @@ openenv-moderation/
 ├── models.py          # Data models (Pydantic)
 ├── inference.py       # AI interaction logic
 ├── server.py          # FastAPI server
+├── server/
+│   ├── __init__.py    # empty file
+│   └── app.py         # main
 ├── main.py            # Local testing
 ├── Dockerfile         # Container setup
 ├── requirements.txt   # Dependencies
