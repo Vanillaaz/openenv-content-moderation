@@ -12,7 +12,7 @@ API_BASE_URL = os.getenv("API_BASE_URL", "https://router.huggingface.co/v1")
 MODEL_NAME = os.getenv("MODEL_NAME", "Qwen/Qwen2.5-72B-Instruct")
 TASK_NAME = os.getenv("MODERATION_TASK", "easy")
 BENCHMARK = "content-moderation"
-MAX_STEPS = 1  # Your env is single-step (done=True after first step)
+MAX_STEPS = 1
 
 
 def log_start(task: str, env: str, model: str) -> None:
@@ -31,16 +31,23 @@ def log_end(success: bool, steps: int, score: float, rewards: List[float]) -> No
 
 
 def get_moderation_decision(client: OpenAI, content: str, task: str) -> str:
-    system_prompt = """You are a content moderation AI. 
-Your job is to classify content and decide whether to APPROVE or REMOVE it.
-Reply with ONLY one of these exact words: APPROVE or REMOVE
-- APPROVE: content is safe and acceptable
-- REMOVE: content is harmful, toxic, hateful, or violates policies"""
+    system_prompt = """You are a content moderation AI.
+Classify the given content and respond in EXACTLY this format (no extra text):
+label=<label>;decision=<decision>;severity=<severity>
+
+For label use one of: safe, toxic, hate, spam
+For decision use one of: approve, warn, remove
+For severity use one of: none, low, medium, high
+
+Examples:
+label=safe;decision=approve;severity=none
+label=toxic;decision=warn;severity=medium
+label=hate;decision=remove;severity=high"""
 
     user_prompt = f"""Task difficulty: {task}
 Content to moderate: {content}
 
-Decision (APPROVE or REMOVE):"""
+Respond with ONLY the classification line:"""
 
     try:
         completion = client.chat.completions.create(
@@ -50,16 +57,16 @@ Decision (APPROVE or REMOVE):"""
                 {"role": "user", "content": user_prompt},
             ],
             temperature=0.1,
-            max_tokens=10,
+            max_tokens=30,
             stream=False,
         )
-        text = (completion.choices[0].message.content or "").strip().upper()
-        if "REMOVE" in text:
-            return "REMOVE"
-        return "APPROVE"
+        text = (completion.choices[0].message.content or "").strip()
+        if "label=" in text and "=" in text:
+            return text.split("\n")[0].strip()
+        return "label=safe;decision=approve;severity=none"
     except Exception as exc:
         print(f"[DEBUG] Model request failed: {exc}", flush=True)
-        return "APPROVE"
+        return "label=safe;decision=approve;severity=none"
 
 
 async def main() -> None:
@@ -98,8 +105,8 @@ async def main() -> None:
                 break
 
         score = sum(rewards) / max(len(rewards), 1)
-        score = min(max(score, 0.0), 1.0)
-        success = score > 0.0
+        score = min(max(score, 0.01), 0.98)  # strictly between 0 and 1
+        success = score > 0.01
 
     except Exception as e:
         print(f"[DEBUG] Error: {e}", flush=True)
