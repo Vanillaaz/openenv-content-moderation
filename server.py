@@ -1,14 +1,17 @@
 from fastapi import FastAPI
 from pydantic import BaseModel
+from typing import Optional
+
 from environment import ModerationEnv
 from models import Action
 
 app = FastAPI()
-
 env = ModerationEnv()
 
-
 # ----------- REQUEST MODELS -----------
+
+class ResetRequest(BaseModel):
+    task: Optional[str] = "easy"
 
 class StepRequest(BaseModel):
     action: str
@@ -16,32 +19,32 @@ class StepRequest(BaseModel):
 
 # ----------- ENDPOINTS -----------
 
-# ✅ FIXED RESET (no body required)
 @app.post("/reset")
-async def reset():
-    result = await env.reset()
+async def reset(req: Optional[ResetRequest] = None):
+    task = req.task if req else "easy"
+
+    result = await env.reset(task)
 
     return {
-        "observation": result.observation.dict(),  # ✅ revert this
+        "observation": result.observation.dict(),
         "reward": result.reward,
         "done": result.done
     }
 
 
-# ✅ STEP endpoint
 @app.post("/step")
 async def step(req: StepRequest):
     action = Action(action=req.action)
+
     result = await env.step(action)
 
     return {
-        "observation": result.observation.dict(),  # ✅ same here
+        "observation": result.observation.dict(),
         "reward": result.reward,
         "done": result.done
     }
 
 
-# ✅ STATE endpoint
 @app.get("/state")
 async def state():
     return await env.state()
