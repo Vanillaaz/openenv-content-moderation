@@ -1,0 +1,9 @@
+[project]
+name = "openenv-content-moderation"
+version = "1.0.0"
+description = "Content moderation environment for AI agents"
+requires-python = ">=3.10"
+
+[tool.openenv]
+entrypoint = "environment:ModerationEnv"
+tasks = ["easy", "medium", "hard"]
