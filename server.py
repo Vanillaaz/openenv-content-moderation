@@ -1,6 +1,5 @@
-from fastapi import FastAPI
+from fastapi import FastAPI, Request
 from pydantic import BaseModel
-from typing import Optional
 
 from environment import ModerationEnv
 from models import Action
@@ -8,10 +7,8 @@ from models import Action
 app = FastAPI()
 env = ModerationEnv()
 
-# ----------- REQUEST MODELS -----------
 
-class ResetRequest(BaseModel):
-    task: Optional[str] = "easy"
+# ----------- REQUEST MODEL -----------
 
 class StepRequest(BaseModel):
     action: str
@@ -20,8 +17,14 @@ class StepRequest(BaseModel):
 # ----------- ENDPOINTS -----------
 
 @app.post("/reset")
-async def reset(req: Optional[ResetRequest] = None):
-    task = req.task if req else "easy"
+async def reset(request: Request):
+    # Handle ANY kind of body safely
+    try:
+        body = await request.json()
+    except:
+        body = {}
+
+    task = body.get("task", "easy")
 
     result = await env.reset(task)
 
@@ -34,9 +37,7 @@ async def reset(req: Optional[ResetRequest] = None):
 
 @app.post("/step")
 async def step(req: StepRequest):
-    action = Action(action=req.action)
-
-    result = await env.step(action)
+    result = await env.step(Action(action=req.action))
 
     return {
         "observation": result.observation.dict(),

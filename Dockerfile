@@ -4,7 +4,7 @@ WORKDIR /app
 
 COPY . .
 
-RUN pip install --no-cache-dir fastapi uvicorn openai pydantic openenv-core
+RUN pip install --no-cache-dir -r requirements.txt
 
 EXPOSE 8000
 
