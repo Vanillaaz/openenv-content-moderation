@@ -1,4 +1,4 @@
-from fastapi import FastAPI, Request
+from fastapi import FastAPI
 from pydantic import BaseModel
 
 from environment import ModerationEnv
@@ -16,19 +16,10 @@ class StepRequest(BaseModel):
 
 # ----------- ENDPOINTS -----------
 
+# 🔥 RESET (NO BODY — IMPORTANT)
 @app.post("/reset")
-async def reset(request: Request):
-    task = "easy"
-
-    if request.headers.get("content-type") == "application/json":
-        try:
-            body = await request.json()
-            if isinstance(body, dict):
-                task = body.get("task", "easy")
-        except:
-            pass
-
-    result = await env.reset(task)
+async def reset():
+    result = await env.reset("easy")
 
     return {
         "observation": result.observation.dict(),
@@ -37,6 +28,7 @@ async def reset(request: Request):
     }
 
 
+# 🔥 STEP
 @app.post("/step")
 async def step(req: StepRequest):
     result = await env.step(Action(action=req.action))
@@ -48,6 +40,7 @@ async def step(req: StepRequest):
     }
 
 
+# 🔥 STATE
 @app.get("/state")
 async def state():
     return await env.state()
