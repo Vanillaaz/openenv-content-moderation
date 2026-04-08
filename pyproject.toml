@@ -3,6 +3,15 @@ name = "openenv-content-moderation"
 version = "1.0.0"
 description = "Content moderation environment for AI agents"
 requires-python = ">=3.10"
+dependencies = [
+    "fastapi",
+    "uvicorn",
+    "pydantic",
+    "openenv-core>=0.2.0",
+]
+
+[project.scripts]
+server = "server:app"
 
 [tool.openenv]
 entrypoint = "environment:ModerationEnv"
