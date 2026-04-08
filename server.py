@@ -18,13 +18,15 @@ class StepRequest(BaseModel):
 
 @app.post("/reset")
 async def reset(request: Request):
-    # Handle ANY kind of body safely
-    try:
-        body = await request.json()
-    except:
-        body = {}
+    task = "easy"
 
-    task = body.get("task", "easy")
+    if request.headers.get("content-type") == "application/json":
+        try:
+            body = await request.json()
+            if isinstance(body, dict):
+                task = body.get("task", "easy")
+        except:
+            pass
 
     result = await env.reset(task)
 
