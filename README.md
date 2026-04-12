@@ -1,7 +1,7 @@
 ---
 
 title: Openenv Content Moderation
-emoji: 👁
+emoji: eye
 colorFrom: red
 colorTo: gray
 sdk: docker
