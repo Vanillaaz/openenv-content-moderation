@@ -1,16 +1,13 @@
 ---
-
 title: Openenv Content Moderation
-emoji: eye
+emoji: "👁"
 colorFrom: red
 colorTo: gray
 sdk: docker
 app_port: 8000
 tags:
-
-* openenv
-  pinned: false
-
+  - openenv
+pinned: false
 ---
 
 # 🛡️ OpenEnv Content Moderation Environment
