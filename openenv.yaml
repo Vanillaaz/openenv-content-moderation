@@ -1,15 +1,77 @@
 name: openenv-content-moderation
 description: Content moderation environment for classifying and handling user-generated text
-version: 1.0
+version: "1.0.0"
+author: "Venisha"
+tags:
+  - openenv
+  - content-moderation
+  - nlp
 
 tasks:
-  - name: easy
-    description: Binary classification of safe vs toxic content
-  - name: medium
-    description: Multi-class classification (hate, spam, toxic, safe)
-  - name: hard
-    description: Full moderation decision with severity and action
+  - id: easy
+    name: easy
+    description: "Binary classification of safe vs toxic content"
+    difficulty: easy
+    max_attempts: 1
+    scoring: "0.01–0.98 partial credit"
+    grader: "grader.grade"
+
+  - id: medium
+    name: medium
+    description: "Multi-class classification (hate, spam, toxic, safe)"
+    difficulty: medium
+    max_attempts: 1
+    scoring: "0.01–0.98 partial credit"
+    grader: "grader.grade"
+
+  - id: hard
+    name: hard
+    description: "Full moderation decision with severity and action"
+    difficulty: hard
+    max_attempts: 1
+    scoring: "0.01–0.98 partial credit"
+    grader: "grader.grade"
+
+  - id: expert
+    name: expert
+    description: "Nuanced classification with label, decision, and severity"
+    difficulty: expert
+    max_attempts: 1
+    scoring: "0.01–0.98 partial credit"
+    grader: "grader.grade"
+
+observation_space:
+  content: "string — the text content to moderate"
+  task: "string — easy | medium | hard | expert"
+
+action_space:
+  action: "string — format: label=<label>;decision=<decision>;severity=<severity>"
+
+reward:
+  type: continuous
+  range: [0.01, 0.98]
+  shaping:
+    - "+0.50 correct label (safe, toxic, hate, spam)"
+    - "+0.29 correct decision (approve, warn, remove)"
+    - "+0.19 correct severity (none, low, medium, high)"
 
 entrypoint:
   module: environment
   class: ModerationEnv
+
+endpoints:
+  - path: /reset
+    method: POST
+    description: Start a new episode
+  - path: /step
+    method: POST
+    description: Submit a moderation decision
+  - path: /state
+    method: GET
+    description: Get current episode metadata
+
+runtime:
+  framework: FastAPI + OpenEnv
+  python: "3.11"
+  docker: true
+  hf_spaces: true
