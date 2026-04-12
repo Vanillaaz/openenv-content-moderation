@@ -1,4 +1,3 @@
-Here's your complete final README.md — copy and paste this entire thing:
 
 ```markdown
 ---
@@ -286,7 +285,3 @@ Expected output:
 
 ---
 
-## 📄 License
-
-MIT License — feel free to use, modify, and build on this environment.
-```
