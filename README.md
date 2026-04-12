@@ -177,6 +177,17 @@ python inference.py
 
 ---
 
+## 📊 Baseline Scores
+
+Baseline agent: `Qwen/Qwen2.5-72B-Instruct`
+
+| Task     | Score Range  |
+| -------- | ------------ |
+| `easy`   | 0.50 – 0.98  |
+| `medium` | 0.50 – 0.98  |
+| `hard`   | 0.50 – 0.79  |
+| `expert` | 0.01 – 0.79  |
+
 ## 👩‍💻 Author
 
 **Venisha Dsouza**
