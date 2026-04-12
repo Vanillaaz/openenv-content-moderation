@@ -15,4 +15,27 @@ server = "app:main"
 
 [tool.openenv]
 entrypoint = "environment:ModerationEnv"
-tasks = ["easy", "medium", "hard"]
+
+[[tool.openenv.tasks]]
+id = "easy"
+name = "easy"
+description = "Binary classification of safe vs toxic content"
+grader = "grader:grade"
+
+[[tool.openenv.tasks]]
+id = "medium"
+name = "medium"
+description = "Multi-class classification (hate, spam, toxic, safe)"
+grader = "grader:grade"
+
+[[tool.openenv.tasks]]
+id = "hard"
+name = "hard"
+description = "Full moderation decision with severity and action"
+grader = "grader:grade"
+
+[[tool.openenv.tasks]]
+id = "expert"
+name = "expert"
+description = "Nuanced classification with label, decision, and severity"
+grader = "grader:grade"
