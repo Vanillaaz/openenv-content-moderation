@@ -10,9 +10,9 @@ from models import Action
 API_KEY = os.getenv("HF_TOKEN") or os.getenv("API_KEY")
 API_BASE_URL = os.getenv("API_BASE_URL", "https://router.huggingface.co/v1")
 MODEL_NAME = os.getenv("MODEL_NAME", "Qwen/Qwen2.5-72B-Instruct")
-TASK_NAME = os.getenv("MODERATION_TASK", "easy")
 BENCHMARK = "content-moderation"
 MAX_STEPS = 1
+TASKS = ["easy", "medium", "hard", "expert"]
 
 
 def log_start(task: str, env: str, model: str) -> None:
@@ -69,19 +69,17 @@ Respond with ONLY the classification line:"""
         return "label=safe;decision=approve;severity=none"
 
 
-async def main() -> None:
-    client = OpenAI(base_url=API_BASE_URL, api_key=API_KEY)
+async def run_task(task_name: str, client: OpenAI) -> None:
     env = ModerationEnv()
-
     rewards: List[float] = []
     steps_taken = 0
     score = 0.0
     success = False
 
-    log_start(task=TASK_NAME, env=BENCHMARK, model=MODEL_NAME)
+    log_start(task=task_name, env=BENCHMARK, model=MODEL_NAME)
 
     try:
-        result = await env.reset(TASK_NAME)
+        result = await env.reset(task_name)
         obs = result.observation
 
         for step in range(1, MAX_STEPS + 1):
@@ -89,7 +87,6 @@ async def main() -> None:
                 break
 
             decision = get_moderation_decision(client, obs.content, obs.task)
-
             result = await env.step(Action(action=decision))
 
             reward = result.reward or 0.0
@@ -105,7 +102,7 @@ async def main() -> None:
                 break
 
         score = sum(rewards) / max(len(rewards), 1)
-        score = min(max(score, 0.01), 0.98)  # strictly between 0 and 1
+        score = min(max(score, 0.01), 0.98)
         success = score > 0.01
 
     except Exception as e:
@@ -117,6 +114,12 @@ async def main() -> None:
         except Exception as e:
             print(f"[DEBUG] env.close() error: {e}", flush=True)
         log_end(success=success, steps=steps_taken, score=score, rewards=rewards)
+
+
+async def main() -> None:
+    client = OpenAI(base_url=API_BASE_URL, api_key=API_KEY)
+    for task_name in TASKS:
+        await run_task(task_name, client)
 
 
 if __name__ == "__main__":
