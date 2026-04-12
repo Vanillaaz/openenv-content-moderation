@@ -13,32 +13,28 @@ tasks:
     description: "Binary classification of safe vs toxic content"
     difficulty: easy
     max_attempts: 1
-    scoring: "0.01–0.98 partial credit"
-    grader: "grader.grade"
+    grader_fn: "grader.grade"
 
   - id: medium
     name: medium
     description: "Multi-class classification (hate, spam, toxic, safe)"
     difficulty: medium
     max_attempts: 1
-    scoring: "0.01–0.98 partial credit"
-    grader: "grader.grade"
+    grader_fn: "grader.grade"
 
   - id: hard
     name: hard
     description: "Full moderation decision with severity and action"
     difficulty: hard
     max_attempts: 1
-    scoring: "0.01–0.98 partial credit"
-    grader: "grader.grade"
+    grader_fn: "grader.grade"
 
   - id: expert
     name: expert
     description: "Nuanced classification with label, decision, and severity"
     difficulty: expert
     max_attempts: 1
-    scoring: "0.01–0.98 partial credit"
-    grader: "grader.grade"
+    grader_fn: "grader.grade"
 
 observation_space:
   content: "string — the text content to moderate"
