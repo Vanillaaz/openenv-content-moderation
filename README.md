@@ -1,4 +1,3 @@
-
 ```markdown
 ---
 title: Openenv Content Moderation
@@ -45,20 +44,20 @@ This makes it ideal for:
 ```
 openenv-content-moderation/
 │
-├── app.py             # FastAPI server (main entrypoint)
-├── environment.py     # Core ModerationEnv logic
-├── tasks.py           # Task datasets (easy/medium/hard/expert)
-├── grader.py          # Deterministic reward/grading logic
-├── models.py          # Pydantic models (Action, Observation, StepResult)
-├── inference.py       # Baseline LLM agent script
-├── openenv.yaml       # OpenEnv environment configuration
-├── pyproject.toml     # Project metadata and dependencies
-├── Dockerfile         # Container definition
-├── requirements.txt   # Python dependencies
-├── uv.lock            # Locked dependency tree
+├── app.py               # FastAPI server (main entrypoint)
+├── environment.py       # Core ModerationEnv logic
+├── tasks.py             # Task datasets (easy/medium/hard/expert)
+├── grader.py            # Deterministic reward/grading logic
+├── models.py            # Pydantic models (Action, Observation, StepResult)
+├── inference.py         # Baseline LLM agent script
+├── openenv.yaml         # OpenEnv environment configuration
+├── pyproject.toml       # Project metadata and dependencies
+├── Dockerfile           # Container definition
+├── requirements.txt     # Python dependencies
+├── uv.lock              # Locked dependency tree
 └── server/
     ├── __init__.py
-    └── app.py         # Server module entrypoint
+    └── app.py           # Server module entrypoint
 ```
 
 ---
@@ -109,6 +108,7 @@ label=<label>;decision=<decision>;severity=<severity>
 | `severity` | `none`, `low`, `medium`, `high` | Severity level |
 
 ### Example Actions
+
 ```
 label=safe;decision=approve;severity=none
 label=toxic;decision=warn;severity=medium
@@ -128,7 +128,7 @@ The grader provides **partial credit** — agents are rewarded for each correct 
 | Correct `decision` | +0.29 | Decision matches expected value |
 | Correct `severity` | +0.19 | Severity matches expected value |
 
-> All scores are clamped strictly between **0.01 and 0.98** — never exact 0.0 or 1.0.
+> **Important:** All scores are clamped strictly between **0.01 and 0.98** — never exact 0.0 or 1.0. This ensures meaningful gradient signal throughout training.
 
 **Maximum possible score per episode: 0.98**
 
@@ -249,10 +249,14 @@ export HF_TOKEN="your_hf_token_here"
 python inference.py
 ```
 
-Expected output:
+Expected output format:
 ```
 [START] task=easy env=content-moderation model=Qwen/Qwen2.5-72B-Instruct
 [STEP] step=1 action=label=safe;decision=approve;severity=none reward=0.98 done=true error=null
+[END] success=true steps=1 score=0.98 rewards=0.98
+
+[START] task=medium env=content-moderation model=Qwen/Qwen2.5-72B-Instruct
+[STEP] step=1 action=label=hate;decision=remove;severity=high reward=0.98 done=true error=null
 [END] success=true steps=1 score=0.98 rewards=0.98
 ```
 
@@ -281,7 +285,8 @@ Expected output:
 
 ## 👩‍💻 Author
 
-**Venisha Dsouza** — Built for the **Meta PyTorch OpenEnv Hackathon** x Scaler School of Technology 🚀
+**Venisha Dsouza**
+Built for the **Meta PyTorch OpenEnv Hackathon** x Scaler School of Technology 🚀
 
 ---
 
